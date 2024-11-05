@@ -1,0 +1,4 @@
+---
+- name: Launch reciever
+  become: true
+  raw: python3 /server/reciever.py &

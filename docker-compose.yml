@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  server:
+    container_name: server
+    image: image_hosts
+    networks:
+      local_network:
+        ipv4_address: 192.168.1.52
+    #  deploy:
+    #    resources:
+    #      limits:
+    #        cpus: '1'
+    #        memory: 512M
+
+  client:
+    container_name: client
+    image: image_hosts
+    networks:
+      local_network:
+        ipv4_address: 192.168.1.53
+    #  deploy:
+    #    resources:
+    #      limits:
+    #        cpus: '1'
+    #        memory: 512M
+
+  ansible:
+    container_name: ansible
+    image: image_ansible
+    command: ansible-playbook -v -i inv/hosts playbook.yml
+    networks:
+      local_network:
+        ipv4_address: 192.168.1.55
+    # Mount ansible directory if not in the image
+    volumes:
+      - ./ansible:/ansible
+    working_dir: /ansible
+
+networks:
+  local_network:
+    driver: bridge
+    name: local_network
+    ipam:
+      config:
+        - subnet: 192.168.0.0/16
