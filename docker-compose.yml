@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  sender:
+    container_name: sender
+    image: kirilliliych/pdris-task3-docker-sender
+    build: sender/
+    command: python3 -u ./sender.py
+    ports:
+      - "5252:5252"
+
+  reciever:
+    container_name: reciever
+    image: kirilliliych/pdris-task3-docker-reciever
+    build: reciever/
+    command: python3 -u ./reciever.py
+    depends_on:
+      - sender
