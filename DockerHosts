@@ -1,0 +1,24 @@
+FROM ubuntu:22.04 AS builder
+
+# Install necessary dependencies and enable ssh for testing/debugging. 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssh-server \
+    vim \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configure SSH for debugging (REMOVE FOR PRODUCTION).
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    echo "root:root" | chpasswd && \
+    service ssh restart
+
+
+# Create a simple stage to use just the necessary artifacts
+FROM ubuntu:22.04
+
+# We'll let Ansible handle copying the application code and installing Python
+
+# Expose SSH port 
+EXPOSE 22
+# Start the sshd daemon, can be removed if you don't need it for debugging
+CMD ["/usr/sbin/sshd", "-D"]

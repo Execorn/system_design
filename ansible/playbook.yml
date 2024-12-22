@@ -1,0 +1,42 @@
+---
+- name: Validate Host Reachability
+  hosts: all  # Use 'all' to target all hosts
+  gather_facts: false # disable fact gathering
+  tasks:
+    - name: Install Python3 and pip
+      apt:
+        name:
+          - python3
+          - python3-pip
+        state: present
+        update_cache: yes
+    - name: Copy the server application code
+      copy:
+        src: ../server
+        dest: /server
+        remote_src: yes 
+    - name: Ping hosts
+      ping:
+      register: ping_result # capture result for later debugging
+    - name: Fail if ping fails
+      fail:
+        msg: "Host {{ ansible_host }} is unreachable"
+      when: ping_result.ping != "pong" # fails task if ping fails
+  
+- name: Deploy Services
+  hosts: all # Use 'all' to target all hosts
+  gather_facts: true # enable fact gathering
+
+  tasks:
+   - name: Launch server
+     ansible.builtin.include_role: # use include role instead of roles
+        name: server
+     when: "'server' in group_names" # check if host is in group
+
+   - name: Launch client
+     ansible.builtin.include_role: # use include role instead of roles
+        name: client
+     when: "'client' in group_names" # check if host is in group
+
+
+# execute the playbook with "ansible-playbook -i inventories/hosts playbook.yml"

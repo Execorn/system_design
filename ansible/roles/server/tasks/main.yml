@@ -1,0 +1,3 @@
+- name: Run sender
+  become: true
+  raw: python3 /server/sender.py &
