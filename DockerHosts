@@ -3,8 +3,6 @@ FROM ubuntu:22.04 AS builder
 # Install necessary dependencies and enable ssh for testing/debugging. 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-server \
-    python3 \
-    python3-pip \
     vim \
     git \
     && rm -rf /var/lib/apt/lists/*
@@ -14,14 +12,11 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
     echo "root:root" | chpasswd && \
     service ssh restart
 
-# Copy the application code
-COPY ./server /server
 
 # Create a simple stage to use just the necessary artifacts
 FROM ubuntu:22.04
 
-# Copy needed files from builder stage
-COPY --from=builder /server /server
+# We'll let Ansible handle copying the application code and installing Python
 
 # Expose SSH port 
 EXPOSE 22

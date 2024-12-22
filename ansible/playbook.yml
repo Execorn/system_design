@@ -3,6 +3,18 @@
   hosts: all  # Use 'all' to target all hosts
   gather_facts: false # disable fact gathering
   tasks:
+    - name: Install Python3 and pip
+      apt:
+        name:
+          - python3
+          - python3-pip
+        state: present
+        update_cache: yes
+    - name: Copy the server application code
+      copy:
+        src: ../server
+        dest: /server
+        remote_src: yes 
     - name: Ping hosts
       ping:
       register: ping_result # capture result for later debugging
